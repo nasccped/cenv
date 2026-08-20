@@ -171,8 +171,13 @@ void string_set_from_colored_string(char *s, ColoredString *cs) {
       tslen += sprintf(temp_string + tslen, ";%d", cs->bg + 40);
   }
 
+  /* copy inner string. This allows 'ColoredString.s' holds a pointer to the self 's' string and
+   * don't panic when setting a new value to s when using itselfs pointer. */
+  char inner_string[1024] = {0};
+  strncpy(inner_string, cs->s, 1024);
+
   if (tslen)
-    sprintf(s, "%sm%s\x1b[0m", temp_string, cs->s);
+    sprintf(s, "%sm%s\x1b[0m", temp_string, inner_string);
   else
-    sprintf(s, "%s", cs->s);
+    sprintf(s, "%s", inner_string);
 }
