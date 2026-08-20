@@ -1,50 +1,21 @@
 #include <stdio.h>
-#include <string.h>
-
-// Prints the help message
-void print_help();
-
-// Prints the app version.
-void print_version();
+#include "cli.h"
 
 int main(int argc, char *argv[]) {
-  char *subcommand;
+  static Cli cli = {0};
 
-  switch (--argc) {
+  if (!cli_parse(&cli, --argc, ++argv))
+    return 1;
 
-    // when no args
-    case 0:
-      printf("Welcome to c-env!\n");
+  switch (cli.action_kind) {
+    case HELP_SUBCOMMAND_AS_FLAG:
+      printf("--help was called!\n");
       break;
 
-    // when one arg
-    case 1:
-      argv++;
-      subcommand = argv[0];
-
-      if (strcmp(subcommand, "help") == 0)
-        print_help();
-      else if (strcmp(subcommand, "version") == 0)
-        print_version();
-      else {
-        fprintf(stderr, "Non valid subcommand: %s.\n", argv[0]);
-        return 1;
-      }
+    case VERSION_SUBCOMMAND_AS_FLAG:
+      printf("--version was called!\n");
       break;
-
-    // when more than 1 arg
-    default:
-      fprintf(stderr, "Expected one (or no) subcommand. Got %d.\n", argc);
-      return 1;
   }
 
   return 0;
-}
-
-void print_help() {
-  printf("TODO: add help printing!\n");
-}
-
-void print_version() {
-  printf("under development!\n");
 }
