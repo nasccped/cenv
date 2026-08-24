@@ -2,133 +2,66 @@
 #include "cli.h"
 #include "cenvutils.h"
 
-/* Help macro when both string pointers for 'colored_set...' and 'string_set...' refers to the same
- * addres. */
-#define COLORED_STRING_AND_SELF_SET(CS_PTR, STYLE, FG, BG, STR_PTR) \
-  do {                                                              \
-    CSSV((CS_PTR), (STYLE), (FG), (BG), (STR_PTR));                 \
-    SSFCS((STR_PTR), (CS_PTR));                                     \
-  } while (0)
+/* Does the 'empty string isn't allowed' error printing. It takes the argument position (index of
+ * the first) whitespace string occurence. */
+inline static void print_empty_string_arg_error(int arg_pos);
 
-/* Alias for 'colored_string_set_values'. */
-#define CSSV(CS_PTR, STYLE, FG, BG, STR_PTR) \
-  colored_string_set_values((CS_PTR), (STYLE), (FG), (BG), (STR_PTR))
+/* Does the 'expecting args' error printing. */
+inline static void print_expecting_arg_error();
 
-/* Alias for 'string_set_from_colored_string' */
-#define SSFCS(STR_PTR, CS_PTR) string_set_from_colored_string((STR_PTR), (CS_PTR))
+/* Does the 'consider using --help flag' hint printing. Note that this function automatically
+ * prints to stderr. */
+inline static void print_help_flag_tip();
 
-/* When a (must) single arg is followeda by another. This function takes also a 'ColoredString'
- * pointer + bold_backtick string to avoid redo allocations on string coloring. */
-void print_error_action_cant_be_followed_by_args(ColoredString *cs, char *action, char *bb);
-
-/* When no arg is provided. This function takes also a 'ColoredString' pointer + bold_backtick
- * string to avoid redo allocations on string coloring. */
-void print_error_expecting_args(ColoredString *cs, char *bb);
-
-/* When the provided arg isn't recognized as a valid action (subcommand/flag). This function takes
- * also a 'ColoredString' pointer + bold_backtick string to avoid redo allocations on string
- * coloring. */
-void print_error_undefined_action(ColoredString *cs, char *action, char *bb);
+/* Does the 'undefined flag/subcommand call ...' error printing on the provided string argument. */
+inline static void print_undefined_argument_call_error(char *arg);
 
 int cli_parse(Cli *cli, int arg_count, char *args[]) {
-  ColoredString cs = {0};
-  char bold_backtick[16] = "`";
-
-  COLORED_STRING_AND_SELF_SET(&cs, BOLD, NONE_COLOR, NONE_COLOR, bold_backtick);
-
   // if no args
   if (!arg_count || !args) {
-    print_error_expecting_args(&cs, bold_backtick);
+    print_expecting_arg_error();
     return 0;
   }
 
   for (int i = 0; i < arg_count; i++) {
     if (string_is_whitespace(args[i])) {
-      print_error_tag("empty string isn't a valid argument!\n");
+      print_empty_string_arg_error(i + 1);
       return 0;
     }
   }
 
   if (strcmp(args[0], "--help") == 0) {
-    if (--arg_count) {
-      print_error_action_cant_be_followed_by_args(&cs, args[0], bold_backtick);
-      return 0;
-    }
     cli->action_kind = HELP_SUBCOMMAND_AS_FLAG;
-  }
-
-  else if (strcmp(args[0], "--version") == 0) {
-    if (--arg_count) {
-      print_error_action_cant_be_followed_by_args(&cs, args[0], bold_backtick);
-      return 0;
-    }
+  } else if (strcmp(args[0], "--version") == 0) {
     cli->action_kind = VERSION_SUBCOMMAND_AS_FLAG;
-  }
-
-  else {
-    print_error_undefined_action(&cs, args[0], bold_backtick);
+    return parse_version_action(&cli->action.version, --arg_count, ++args);
+  } else {
+    print_undefined_argument_call_error(args[0]);
     return 0;
   }
 
   return 1;
 }
 
-void print_error_action_cant_be_followed_by_args(ColoredString *cs, char *action, char *wb) {
-  char yellow_action[1024] = {0};
-
-  CSSV(cs, BOLD, BRIGHT_YELLOW, NONE_COLOR, action);
-  SSFCS(yellow_action, cs);
-
-  print_error_tag(
-    "%s%s%s %s can't be followed by any argument!\n",
-    wb,
-    yellow_action,
-    wb,
-    string_is_program_flag(action) ? "flag" : "subcommand"
-  );
+inline static void print_empty_string_arg_error(int arg_pos) {
+  print_error_tag("empty string isn't a valid argument (%d° argument)!\n", arg_pos);
+  print_help_flag_tip();
 }
 
-void print_error_expecting_args(ColoredString *cs, char *wb) {
-  char
-    green_cenv[16] = "cenv",
-    bold_one[16] = "one",
-    green_help_flag[16] = "--help";
-
-  COLORED_STRING_AND_SELF_SET(cs, BOLD, BRIGHT_GREEN, NONE_COLOR, green_cenv);
-  COLORED_STRING_AND_SELF_SET(cs, BOLD, NONE_COLOR, NONE_COLOR, bold_one);
-  COLORED_STRING_AND_SELF_SET(cs, BOLD, BRIGHT_GREEN, NONE_COLOR, green_help_flag);
-
-  print_error_tag("no argument was provided.\n\n");
-  printerr("%s%s%s program expected at least %s subcommand/flag.\n\n", wb, green_cenv, wb, bold_one);
-  print_note_tag(
-    1,
-    "consider using %s%s%s flag to get a more detailed\n"
-    "overview!\n",
-    wb,
-    green_help_flag,
-    wb
-  );
+inline static void print_expecting_arg_error() {
+  print_error_tag("expecting at least %s argument.\n", BOLD_LITERAL("one"));
+  print_help_flag_tip();
 }
 
-void print_error_undefined_action(ColoredString *cs, char *action, char *bb) {
-  char yellow_action[1024] = {0};
-  char green_help_flag[32] = "--help";
+inline static void print_help_flag_tip() {
+  printerr("consider using the %s flag.\n", BOLD_LITERAL("--help"));
+}
 
-  CSSV(cs, BOLD, BRIGHT_YELLOW, NONE_COLOR, action);
-  SSFCS(yellow_action, cs);
-  COLORED_STRING_AND_SELF_SET(cs, BOLD, BRIGHT_GREEN, NONE_COLOR, green_help_flag);
-
+inline static void print_undefined_argument_call_error(char *arg) {
   print_error_tag(
-    "undefined %s being used (%s).\n\n",
-    string_is_program_flag(action) ? "flag" : "subcommand",
-    yellow_action
+    "undefined program %s (%s).\n",
+    string_is_program_flag(arg) ? "flag" : "subcommand",
+    arg
   );
-
-  printerr(
-    "Consider using the %s%s%s flag to get a more detailed\n"
-    "overview!\n",
-    bb,
-    green_help_flag,
-    bb
-  );
+  print_help_flag_tip();
 }
