@@ -4,19 +4,13 @@
 #include "version_action.h"
 
 // default value for verbose flag.
-#define VERBOSE_FLAG "--verbose"
+#define LONG_FLAG "--long"
 
 /* Set version data values (from gcc args defines). */
 void set_version_data_fields(Version *version);
 
 int parse_version_action(Version *version, int arg_count, char *args[]) {
   int display_mode_set;
-
-  // since version is expected to be non-null.
-  if (!version) {
-    printerr("(bad program): version pointer refers to a <NULL> address!\n");
-    return 0;
-  }
 
   // set data
   set_version_data_fields(version);
@@ -27,26 +21,26 @@ int parse_version_action(Version *version, int arg_count, char *args[]) {
   for (int i = 0; i < arg_count; i++) {
 
     // when refers to verbose flag
-    if (strcmp(args[i], VERBOSE_FLAG) == 0) {
+    if (strcmp(args[i], LONG_FLAG) == 0) {
 
       // if already done
       if (display_mode_set) {
-        print_error_tag("%s flag passed twice.\n", VERBOSE_FLAG);
+        print_error_tag("%s flag passed twice.\n", LONG_FLAG);
         return 0;
       }
 
       // set mode.
-      version->display_mode = VERBOSE_DISPLAY;
+      version->display_mode = LONG_DISPLAY;
       display_mode_set++;
       continue;
     }
 
     print_error_tag(
       "unrecognized version %s (%s)!\n",
-      string_is_program_flag(args[i]) ? "flag" : "command",
+      string_is_program_flag(args[i]) ? "flag" : "subcommand",
       args[i]
     );
-    printerr("Available version flags are '%s' only.\n", VERBOSE_FLAG);
+    printerr("available flags are '%s' only.\n", LONG_FLAG);
 
     return 0;
   }
@@ -64,7 +58,7 @@ int run_version_action(Version *version) {
   printf("%s %s", version->app_name, version->tag_name);
 
   // print commit + date if verbose
-  if (version->display_mode == VERBOSE_DISPLAY) {
+  if (version->display_mode == LONG_DISPLAY) {
     printf(" (%s %s)", version->commit_hash, version->commit_date);
   }
 

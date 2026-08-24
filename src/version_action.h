@@ -18,7 +18,7 @@ typedef struct {
     SIMPLE_DISPLAY,
 
     /* Prints all the data. */
-    VERBOSE_DISPLAY
+    LONG_DISPLAY
 
   } display_mode;
 
