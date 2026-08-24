@@ -13,7 +13,9 @@ int main(int argc, char *argv[]) {
       break;
 
     case VERSION_SUBCOMMAND_AS_FLAG:
-      printf("--version was called!\n");
+      if (!run_version_action(&cli.action.version))
+        return 1;
+
       break;
   }
 
