@@ -76,3 +76,16 @@ int string_is_whitespace(char *s) {
   // final instruction means only whitespace chars found
   return 1;
 }
+
+char *string_ansi_stylize(char *dest, int style, char *source) {
+  if (!dest)
+    return NULL;
+
+  if (style <= 0) {
+    sprintf(dest, "%s", source);
+    return dest;
+  }
+
+  sprintf(dest, "\x1b[%dm%s\x1b[0m", style, source);
+  return dest;
+}

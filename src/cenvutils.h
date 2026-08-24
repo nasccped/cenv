@@ -34,4 +34,8 @@ int string_is_program_flag(char *s);
 /* Returns if the provided char pointer refers to NULL / zero-length / whitespace only string. */
 int string_is_whitespace(char *s);
 
+/* Apply ansi escape styling to a given dest char pointer. This function also returns the dest
+ * address. */
+char *string_ansi_stylize(char *dest, int style, char *source);
+
 #endif
