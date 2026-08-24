@@ -1,6 +1,8 @@
 #ifndef _CLI_H_
 #define _CLI_H_
 
+#include "version_action.h"
+
 /* Refers to the cli structured call. This struct can be parsed from stdin args by using the
  * 'parse_cli' function. */
 typedef struct {
@@ -15,6 +17,14 @@ typedef struct {
     VERSION_SUBCOMMAND_AS_FLAG
 
   } action_kind;
+
+  /* Action auxiliar struct. */
+  union {
+
+    /* When version is called. */
+    Version version;
+
+  } action;
 
 } Cli;
 
