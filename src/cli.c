@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "cli.h"
 #include "cenvutils.h"
@@ -53,7 +54,13 @@ int cli_parse(Cli *cli, int arg_count, char *args[]) {
 }
 
 inline static void print_empty_string_arg_error(int arg_pos) {
-  print_error_tag("empty string isn't a valid argument (%d° argument)!\n", arg_pos);
+  char pos_str[64], bold[64];
+  sprintf(pos_str, "%d° arg", arg_pos);
+
+  print_error_tag(
+    "empty string (%s) isn't a valid argument!\n",
+    string_ansi_stylize(bold, 1, pos_str)
+  );
   print_help_flag_tip();
 }
 
@@ -67,10 +74,12 @@ inline static void print_help_flag_tip() {
 }
 
 inline static void print_undefined_argument_call_error(char *arg) {
+  char bold[1024], magenta[1024];
+
   print_error_tag(
     "undefined program %s (%s).\n",
     string_is_program_flag(arg) ? "flag" : "subcommand",
-    arg
+    string_ansi_stylize(bold, 1, string_ansi_stylize(magenta, 95, arg))
   );
   print_help_flag_tip();
 }
