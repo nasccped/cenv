@@ -35,7 +35,11 @@ int string_is_program_flag(char *s);
 int string_is_whitespace(char *s);
 
 /* Apply ansi escape styling to a given dest char pointer. This function also returns the dest
- * address. */
+ * address.
+ *
+ * WARN: dest and source pointer shouldn't be the same address (even if enough size). This function
+ *       works with 'sprintf' function and passing 'sprintf(s, "%s...", s, ...)' can leads to
+ *       undefined behavior. */
 char *string_ansi_stylize(char *dest, int style, char *source);
 
 #endif
