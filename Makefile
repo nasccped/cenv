@@ -9,4 +9,7 @@ DEFINE_VALUES=-DAPP_NAME='"$(FINAL_BINARY)"' -DTAG_NAME='"temp-tag"' -DTAG_COMMI
 build: $(FILES)
 	$(CC) $^ -o $(FINAL_BINARY) $(CFLAGS) $(DEFINE_VALUES)
 
+fmt:
+	clang-format -i src/*.c src/*.h --style=Microsoft
+
 .PHONY: build
