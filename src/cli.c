@@ -2,6 +2,12 @@
 #include "cli.h"
 #include "cenvutils.h"
 
+/* Checks if the provided X string refers to the help subcommand/flag. */
+#define IS_HELP_ACTION(X) strcmp((X), "help") == 0 || strcmp((X), "--help") == 0
+
+/* Checks if the provided X string refers to the version subcommand/flag. */
+#define IS_VERSION_ACTION(X) strcmp((X), "version") == 0 || strcmp((X), "--version") == 0
+
 /* Does the 'empty string isn't allowed' error printing. It takes the argument position (index of
  * the first) whitespace string occurence. */
 inline static void print_empty_string_arg_error(int arg_pos);
@@ -30,17 +36,20 @@ int cli_parse(Cli *cli, int arg_count, char *args[]) {
     }
   }
 
-  if (strcmp(args[0], "--help") == 0) {
-    cli->action_kind = HELP_SUBCOMMAND_AS_FLAG;
-  } else if (strcmp(args[0], "--version") == 0) {
-    cli->action_kind = VERSION_SUBCOMMAND_AS_FLAG;
-    return parse_version_action(&cli->action.version, --arg_count, ++args);
-  } else {
-    print_undefined_argument_call_error(args[0]);
-    return 0;
+  char *action = args[0];
+  args++;
+  arg_count--;
+
+  if (IS_HELP_ACTION(action)) {
+    cli->action_kind = HELP_ACTION;
+    return 1;
+  } else if (IS_VERSION_ACTION(action)) {
+    cli->action_kind = VERSION_ACTION;
+    return parse_version_action(&cli->action.version, arg_count, args);
   }
 
-  return 1;
+  print_undefined_argument_call_error(action);
+  return 0;
 }
 
 inline static void print_empty_string_arg_error(int arg_pos) {
