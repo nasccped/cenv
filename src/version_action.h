@@ -25,7 +25,7 @@ typedef struct {
 } Version;
 
 /* Does the version parsing using a version struct pointer + remaining arguments. */
-int parse_version_action(Version *version, int arg_count, char *args[]);
+int version_action_parse(Version *version, int arg_count, char *args[]);
 
 /* Run the version struct pointer action. */
 int run_version_action(Version *version);

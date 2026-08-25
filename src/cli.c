@@ -46,7 +46,7 @@ int cli_parse(Cli *cli, int arg_count, char *args[]) {
     return 1;
   } else if (IS_VERSION_ACTION(action)) {
     cli->action_kind = VERSION_ACTION;
-    return parse_version_action(&cli->action.version, arg_count, args);
+    return version_action_parse(&cli->action.version, arg_count, args);
   }
 
   print_undefined_argument_call_error(action);

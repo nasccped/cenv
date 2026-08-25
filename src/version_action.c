@@ -9,7 +9,7 @@
 /* Set version data values (from gcc args defines). */
 void set_version_data_fields(Version *version);
 
-int parse_version_action(Version *version, int arg_count, char *args[]) {
+int version_action_parse(Version *version, int arg_count, char *args[]) {
   int display_mode_set;
 
   // set data
