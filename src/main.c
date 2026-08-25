@@ -8,11 +8,11 @@ int main(int argc, char *argv[]) {
     return 1;
 
   switch (cli.action_kind) {
-    case HELP_SUBCOMMAND_AS_FLAG:
+    case HELP_ACTION:
       printf("--help was called!\n");
       break;
 
-    case VERSION_SUBCOMMAND_AS_FLAG:
+    case VERSION_ACTION:
       if (!run_version_action(&cli.action.version))
         return 1;
 

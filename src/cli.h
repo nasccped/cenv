@@ -11,10 +11,10 @@ typedef struct {
   enum {
 
     /* Refers to the help flag at global scope (cenv --help). */
-    HELP_SUBCOMMAND_AS_FLAG,
+    HELP_ACTION,
 
     /* Refers to the version flag at global scope (cenv --version). */
-    VERSION_SUBCOMMAND_AS_FLAG
+    VERSION_ACTION
 
   } action_kind;
 
