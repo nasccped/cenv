@@ -3,28 +3,27 @@
 
 /* Represents a version info single line (such as
  * "<APP_NAME> <TAG_NAME> (<COMMIT_HASH> <COMMIT_DATE>)"). */
-typedef struct {
-  // refers to version info
-  const char
-    *app_name,
-    *tag_name,
-    *commit_hash,
-    *commit_date;
+typedef struct
+{
+    // refers to version info
+    const char *app_name, *tag_name, *commit_hash, *commit_date;
 
-  /* Display standard. */
-  enum {
+    /* Display standard. */
+    enum
+    {
 
-    /* Just prints the app_name followed by the tag name. */
-    SIMPLE_DISPLAY,
+        /* Just prints the app_name followed by the tag name. */
+        SIMPLE_DISPLAY,
 
-    /* Prints all the data. */
-    LONG_DISPLAY
+        /* Prints all the data. */
+        LONG_DISPLAY
 
-  } display_mode;
+    } display_mode;
 
 } Version;
 
-/* Does the version parsing using a version struct pointer + remaining arguments. */
+/* Does the version parsing using a version struct pointer + remaining
+ * arguments. */
 int version_action_parse(Version *version, int arg_count, char *args[]);
 
 /* Run the version struct pointer action. */
