@@ -3,8 +3,11 @@ SRC=./src
 FILES=$(wildcard $(SRC)/*.c)
 CFLAGS=-Wall -Wextra -Werror
 FINAL_BINARY=cenv
-DEFINE_VALUES=-DAPP_NAME='"$(FINAL_BINARY)"' -DTAG_NAME='"temp-tag"' -DTAG_COMMIT_HASH='"temp-hash"' \
-							-DTAG_COMMIT_DATE='"0000-00-00"'
+DEFINE_VALUES=-DAPP_NAME='"$(FINAL_BINARY)"' \
+							-DTAG_ANNOTATION='"$(shell git describe --tags --abbrev=0)"' \
+							-DSHORT_COMMIT_HASH='"$(shell git describe | sed 's/.*-g//')"' \
+							-DFULL_COMMIT_HASH='"$(shell git rev-parse HEAD)"' \
+							-DCOMMIT_DATE='"$(shell git log -1 --format=%cs)"'
 
 build: $(FILES)
 	$(CC) $^ -o $(FINAL_BINARY) $(CFLAGS) $(DEFINE_VALUES)
