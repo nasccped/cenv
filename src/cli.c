@@ -1,9 +1,8 @@
 #include "cli.h"
-
+#include "cenv_common_error_display.h"
+#include "cenvutils.h"
 #include <stdio.h>
 #include <string.h>
-
-#include "cenvutils.h"
 
 /* Checks if the provided X string refers to the help subcommand/flag. */
 #define IS_HELP_ACTION(X) strcmp((X), "help") == 0 || strcmp((X), "--help") == 0
